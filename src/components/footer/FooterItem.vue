@@ -36,9 +36,9 @@
             <img :src="require('@/assets/icon/whatsapp.svg')" class="w-[18px] h-[18px] icon-blue"/>
             <span>+62 878-5401-9415</span>
           </a>
-          <a target="_blank" href="https://www.instagram.com/iom_itb" class="flex items-center gap-2 mb-1 hover:underline">
+          <a target="_blank" href="https://www.instagram.com/iom_itb.official" class="flex items-center gap-2 mb-1 hover:underline">
             <img :src="require('@/assets/icon/instagram.svg')" class="w-[18px] h-[18px] icon-blue"/>
-            <span>iom_itb</span>
+            <span>iom_itb.official</span>
           </a>
           <a target="_blank" href="https://youtube.com/@iom-itb" class="flex items-center gap-2 mb-1 hover:underline">
             <img :src="require('@/assets/icon/youtube.svg')" class="w-[18px] h-[18px] icon-blue"/>
