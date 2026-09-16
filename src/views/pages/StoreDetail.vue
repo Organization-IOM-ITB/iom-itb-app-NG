@@ -137,7 +137,7 @@
           Upload Bukti Pembayaran <span class="text-red-500">*</span>
         </label>
         <span class="block text-sm font-medium text-gray-500">
-          No Rek. 12345678 a/n. suka (BCA)
+          No. Rekening 0028668954 (BNI) An. IOM-ITB
         </span>
 
         <input
