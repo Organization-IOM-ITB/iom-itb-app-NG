@@ -53,6 +53,10 @@
             <p class="text-gray-500">Alamat Pengiriman</p>
             <p class="font-semibold">{{ transaction.address }}</p>
           </div>
+          <div v-if="transaction.notes" class="md:col-span-2">
+            <p class="text-gray-500">Catatan</p>
+            <p class="font-semibold whitespace-pre-line">{{ transaction.notes }}</p>
+          </div>
         </div>
 
         <div class="border-t border-gray-200 pt-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
