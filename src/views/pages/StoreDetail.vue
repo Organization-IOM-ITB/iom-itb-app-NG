@@ -110,6 +110,19 @@
       </div>
 
       <div class="mb-4">
+        <label for="notes" class="block text-sm font-medium text-gray-700">
+          Catatan (opsional)
+        </label>
+        <textarea
+          id="notes"
+          v-model.trim="userInfo.notes"
+          rows="2"
+          placeholder="Contoh: ukuran baju, warna, titipan pesan, dll."
+          class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-main focus:border-main sm:text-sm"
+        ></textarea>
+      </div>
+
+      <div class="mb-4">
         <label class="block text-sm font-medium text-gray-700">
           Metode Pembayaran <span class="text-red-500">*</span>
         </label>
@@ -211,6 +224,7 @@ export default {
         email: "",
         noTelp: "",
         address: "",
+        notes: "",
       },
       file: [],
       payment: "",
@@ -352,6 +366,7 @@ export default {
         noTelp: this.userInfo.noTelp,
         address: this.userInfo.address,
         qty: Number(this.quantity),
+        notes: this.userInfo.notes || undefined,
       };
 
       const confirmCheckout = await Swal.fire({
