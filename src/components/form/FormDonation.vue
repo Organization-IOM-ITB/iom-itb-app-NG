@@ -37,11 +37,13 @@
           <div class="flex flex-col gap-2 mt-6">
             <h1 class="text-[16px] md:text-[30px] font-[700] text-center md:text-left">Informasi Donasi</h1>
             <p>Bapak - Ibu Orang Tua Mahasiswa ITB ysh.,</p>
-            <p>Kami mengucapkan terima kasih atas partisipasi Bapak/Ibu selaku Orang Tua Mahasiswa ITB yang telah turut berkontribusi untuk membantu Mahasiswa ITB melalui IOM ITB. Kontribusi Bapak-Ibu sebagai anggota IOM kami kelompokkan menjadi:<br/>
-              1. Iuran Sukarela (nominal maksimal Rp. 800.000,-)<br/>
+            <p>Kami mengucapkan terima kasih atas partisipasi Bapak/Ibu selaku Orang Tua Mahasiswa ITB yang telah turut berkontribusi untuk membantu Mahasiswa ITB melalui IOM ITB. Kontribusi Bapak-Ibu sebagai anggota IOM kami kelompokkan menjadi :<br/>
+              1. Iuran Sukarela (yang nominal maksimal sebesar Rp. 1.000.000,-)<br/>
               2. ⁠Sumbangan/Donasi
             </p>
-            <p>Iuran Sukarela akan kami salurkan selama 4 tahun dalam bentuk bantuan UKT, Tugas Akhir, dan Biaya Hidup bagi mahasiswa yang membutuhkan. Sumbangan/Donasi juga dipergunakan untuk bantuan tak terduga seperti biaya kesehatan, biaya penunjang pendidikan, dan dana talangan darurat.</p>
+            <p>Iuran Sukarela dari Bapak/Ibu tersebut akan kami salurkan selama 4 tahun dalam bentuk bantuan UKT, Tugas Akhir dan Biaya Hidup bagi mahasiswa yang membutuhkan. Hal ini dimaksudkan untuk keberlangsungan program bantuan kepada Mahasiswa.</p>
+            <p>Adapun Sumbangan/Donasi dari Bapak/Ibu disamping disalurkan untuk bantuan UKT, Tugas Akhir dan Biaya Hidup, juga dipergunakan untuk bantuan tak terduga bagi Mahasiswa, seperti biaya kesehatan, biaya penunjang pendidikan, dana talangan darurat dll.</p>
+            <p>Sebagai mitra ITB, IOM ITB senantiasa berkoordinasi dengan Direktorat kemahasiswaan ITB dalam penyaluran bantuan. Oleh karenanya kontribusi Bapak/Ibu dalam membantu mahasiswa melalui IOM ITB akan sangat membantu para mahasiswa untuk mengatasi kendala biaya selama masa studinya. Semoga partisipasi Bapak/Ibu menjadi amal jariyah &amp; perwujudan rasa syukur kepada Tuhan atas segala nikmat telah kita terima.</p>
             <p>Hormat Kami,<br/>
               an. Pengurus IOM ITB 2024 2027<br/>
               Hendro Setyanto<br/>

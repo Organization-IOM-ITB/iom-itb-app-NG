@@ -25,11 +25,11 @@
           </div>
         </button>
         <button
-          @click="chooseMidtrans"
-          class="w-full bg-main text-white font-[700] rounded-xl px-4 py-4 text-left hover:opacity-[0.92] transition"
+          disabled
+          class="w-full bg-gray-200 text-gray-500 font-[700] rounded-xl px-4 py-4 text-left cursor-not-allowed"
         >
-          <div class="text-[16px] md:text-[18px]">Pembayaran Otomatis</div>
-          <div class="text-[13px] text-white/90 font-[400] mt-1">
+          <div class="text-[16px] md:text-[18px]">Pembayaran Otomatis — Sementara Tidak Tersedia</div>
+          <div class="text-[13px] text-gray-500 font-[400] mt-1">
             Bayar langsung via kartu/VA/e-wallet/QRIS (Midtrans).
           </div>
         </button>
@@ -470,6 +470,8 @@ export default {
       }
     },
 
+    // Belum terpakai selama tombol Pembayaran Otomatis dinonaktifkan.
+    // Dipertahankan agar mengaktifkannya kembali cukup mengembalikan tombolnya.
     chooseMidtrans() {
       this.isChooserOpen = false;
       this.isDonationOpen = true;
