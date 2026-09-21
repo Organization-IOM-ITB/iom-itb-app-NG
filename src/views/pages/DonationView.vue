@@ -372,9 +372,9 @@ export default {
         },
         {
           number: "3",
-          title: "Unggah Bukti & Konfirmasi",
+          title: "Konfirmasi Donasi",
           description:
-            "Unggah bukti pembayaran dengan jelas. Tanda terima akan dikirim melalui WhatsApp atau email.",
+            "Khusus transfer manual, unggah bukti pembayaran dengan jelas; pembayaran otomatis tidak memerlukannya. Tanda terima akan dikirim melalui WhatsApp atau email.",
         },
       ],
 
@@ -420,7 +420,7 @@ export default {
         {
           title: "Kode Unik Fakultas",
           description:
-            "Kode unik transfer manual mengikuti kode 3 digit fakultas donor (dipilih di form) — bukan lagi kode per jenis donasi.",
+            "Kode unik mengikuti kode 3 digit fakultas donor (dipilih di form) — bukan lagi kode per jenis donasi — dan ditambahkan ke nominal pada kedua metode pembayaran.",
         },
         {
           title: "Konfirmasi via WhatsApp/Email",
@@ -430,8 +430,9 @@ export default {
       ],
 
       additionalNotes: [
-        "Untuk pembayaran manual, kode unik = 3 digit kode fakultas Anda; kode akan muncul di form setelah memilih fakultas.",
-        "Pembayaran online via Midtrans tidak memerlukan kode unik maupun upload bukti bayar.",
+        "Kode unik = 3 digit kode fakultas Anda; kode akan muncul di form setelah memilih fakultas.",
+        "Kode unik fakultas ditambahkan ke nominal donasi pada kedua metode pembayaran, termasuk Midtrans.",
+        "Pembayaran online via Midtrans tidak memerlukan upload bukti bayar karena terkonfirmasi otomatis.",
         "Gunakan nomor WhatsApp dan email aktif agar informasi konfirmasi dapat diterima dengan baik.",
       ],
     };

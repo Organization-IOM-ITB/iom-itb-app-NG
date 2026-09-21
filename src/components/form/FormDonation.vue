@@ -126,8 +126,13 @@
           <div v-else-if="data.paymentMethod === 'Online (Midtrans)'" class="flex flex-col gap-2 mt-6 bg-blue-50 border border-blue-200 p-4 rounded">
             <h2 class="text-[16px] md:text-[24px] font-[700]">Pembayaran Online via Midtrans</h2>
             <p>Setelah menekan <strong>Kirim</strong>, jendela pembayaran Midtrans akan terbuka. Anda dapat membayar dengan kartu kredit, transfer bank, e-wallet, QRIS, dan metode lainnya.</p>
-            <p v-if="selectedFaculty" class="text-sm text-gray-600">Transaksi akan tercatat atas fakultas <strong>{{ selectedFaculty.name }}</strong> (kode {{ selectedFaculty.kodeUnik }}).</p>
-            <p v-if="selectedFaculty && donationAmountSummary.isValidBaseAmount" class="text-sm text-gray-600">Tagihan Midtrans akan dibuat sebesar <strong>{{ formattedGrossAmount }}</strong>.</p>
+            <p>Tagihan dibuat <strong>tepat sesuai total pembayaran</strong>, yaitu nominal dasar dengan 3 digit terakhir <strong>000</strong> ditambah <strong>kode unik fakultas</strong> Anda.</p>
+            <p v-if="selectedFaculty">
+              Fakultas <strong>{{ selectedFaculty.name }}</strong> — kode unik: <strong class="font-mono">{{ selectedFaculty.kodeUnik }}</strong>
+            </p>
+            <p v-else class="text-sm text-gray-600">Pilih fakultas terlebih dahulu untuk melihat kode unik Anda.</p>
+            <p v-if="selectedFaculty && donationAmountSummary.isValidBaseAmount">Total pembayaran: <strong>{{ formattedGrossAmount }}</strong></p>
+            <p class="text-sm text-gray-600">Anda tidak perlu mengunggah bukti bayar — pembayaran terkonfirmasi otomatis.</p>
           </div>
 
           <div class="flex flex-col md:flex-row md:justify-between gap-4 mt-4">
