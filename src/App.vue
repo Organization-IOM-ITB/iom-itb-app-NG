@@ -18,17 +18,18 @@ export default {
 </script>
 
 <style>
-@import "./css/style.css";
 @import url("https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&display=swap");
+@import "./css/iom-tokens.css";
+@import "./css/style.css";
 
 html,
 body {
   scroll-behavior: smooth;
-  font-family: "DM Sans", sans-serif;
+  font-family: var(--iom-font-sans);
   -webkit-font-smoothing: antialiased;
   font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
-  background-color: #eef1f5;
+  background-color: var(--iom-bg);
 }
 </style>

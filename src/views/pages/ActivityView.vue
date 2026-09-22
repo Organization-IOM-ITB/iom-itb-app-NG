@@ -293,7 +293,7 @@
               @input="debouncedSearch"
               type="search"
               placeholder="Cari judul, konten, tag, atau kontributor..."
-              class="h-[52px] w-full rounded-xl border-2 border-[#b8c7e3] bg-[#f8fbff] py-3.5 pl-12 pr-12 text-[15px] text-gray-800 shadow-sm transition focus:border-[#003793] focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100"
+              class="h-[52px] w-full rounded-xl border-2 border-line-brand bg-surface-subtle py-3.5 pl-12 pr-12 text-[15px] text-gray-800 shadow-sm transition focus:border-primary focus:bg-white focus:outline-none focus:ring-4 focus:ring-blue-100"
             />
             <button
               v-if="search"

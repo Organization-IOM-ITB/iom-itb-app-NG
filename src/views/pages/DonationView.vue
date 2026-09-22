@@ -146,7 +146,7 @@
         <div
           v-for="step in paymentSteps"
           :key="step.number"
-          class="bg-white rounded-[28px] p-6 md:p-8 shadow-soft border border-[#E7ECF8] h-full"
+          class="bg-white rounded-[28px] p-6 md:p-8 shadow-soft border border-line-brand h-full"
         >
           <div class="flex items-center justify-between mb-5">
             <div
@@ -170,7 +170,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Left -->
         <div
-          class="bg-white rounded-[28px] p-6 md:p-8 shadow-soft border border-[#E7ECF8]"
+          class="bg-white rounded-[28px] p-6 md:p-8 shadow-soft border border-line-brand"
         >
           <div class="flex items-center gap-3 mb-5">
             <div
@@ -203,7 +203,7 @@
               class="flex items-start gap-3"
             >
               <div
-                class="w-6 h-6 min-w-[24px] rounded-full bg-[#E8EEFF] text-main flex items-center justify-center mt-0.5"
+                class="w-6 h-6 min-w-[24px] rounded-full bg-surface-brand text-main flex items-center justify-center mt-0.5"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -232,7 +232,7 @@
             </div>
           </div>
 
-          <div class="mt-6 bg-[#F6F8FF] border border-[#DCE5FF] rounded-[22px] p-4">
+          <div class="mt-6 bg-surface-subtle border border-line-brand rounded-[22px] p-4">
             <p class="text-main text-[14px] md:text-[15px] leading-relaxed">
               <span class="font-[700]">Catatan:</span> Pastikan data yang diisi
               sesuai, bukti pembayaran terlihat jelas, dan pilih metode
@@ -243,7 +243,7 @@
 
         <!-- Right -->
         <div
-          class="bg-white rounded-[28px] p-6 md:p-8 shadow-soft border border-[#E7ECF8]"
+          class="bg-white rounded-[28px] p-6 md:p-8 shadow-soft border border-line-brand"
         >
           <div class="flex items-center gap-3 mb-5">
             <div
@@ -273,7 +273,7 @@
             <div
               v-for="(method, index) in paymentMethods"
               :key="index"
-              class="border border-[#E4E9F5] rounded-[22px] p-4 bg-[#FAFBFF]"
+              class="border border-line-brand rounded-[22px] p-4 bg-surface-subtle"
             >
               <p class="text-main text-[18px] font-[700] mb-1">
                 {{ method.title }}

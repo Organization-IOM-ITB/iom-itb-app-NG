@@ -76,7 +76,7 @@
         <h4 class="text-[18px] md:text-[22px] text-main font-[600] mb-2">Berdasarkan SK Rektor ITB No. 45/SEK/REK/ITB/70</h4>
         <h3 class="text-[28px] md:text-[40px] text-main font-[800] mb-8">Peresmian IOM ITB</h3>
         
-        <div class="bg-[#F2F7FC] p-6 md:p-8 rounded-2xl border border-[#003A6E]/10 mb-8 shadow-sm">
+        <div class="bg-surface-subtle p-6 md:p-8 rounded-2xl border border-primary-deep/10 mb-8 shadow-sm">
           <h5 class="text-main font-[800] text-[20px] md:text-[24px] mb-6 flex items-center">
             <span class="w-2 h-8 bg-main mr-4 rounded-full"></span>
             PENGURUS IOM-ITB 1970
@@ -201,7 +201,7 @@
         <h4 class="text-[18px] md:text-[22px] text-main font-[600] mb-2 uppercase tracking-wide">Pembaruan Legalitas 2026</h4>
         <h3 class="text-[28px] md:text-[36px] text-main font-[800] mb-6">SK Menteri Hukum RI</h3>
         
-        <div class="bg-[#F2F7FC] p-6 rounded-2xl border-l-8 border-main shadow-md mb-6">
+        <div class="bg-surface-subtle p-6 rounded-2xl border-l-8 border-main shadow-md mb-6">
            <p class="text-main font-[700] text-[16px] md:text-[19px] mb-2">Nomor AHU-0003135.AH.01.07.TAHUN 2026</p>
            <p class="text-main/60 text-[14px] md:text-[16px] font-[600]">Tanggal 17 April 2026</p>
         </div>

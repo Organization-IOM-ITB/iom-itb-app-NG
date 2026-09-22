@@ -126,7 +126,7 @@
             </div>
           </article>
         </div>
-        <div v-else class="mt-6 rounded-[10px] bg-[#F2F7FC] px-5 py-8 text-center text-[14px] font-[600] text-main/70">
+        <div v-else class="mt-6 rounded-[10px] bg-surface-subtle px-5 py-8 text-center text-[14px] font-[600] text-main/70">
           Belum ada kegiatan kemitraan yang terdaftar untuk mitra ini.
         </div>
       </section>
@@ -145,7 +145,7 @@
             :key="partner.id"
             class="group overflow-hidden rounded-[10px] bg-main text-white shadow-lg transition-transform duration-200 hover:-translate-y-1"
           >
-            <div class="relative h-[170px] overflow-hidden bg-[#dce9ff]">
+            <div class="relative h-[170px] overflow-hidden bg-surface-brand">
               <img
                 :src="partnerImage(partner)"
                 :alt="partner.name"
@@ -169,7 +169,7 @@
           </article>
         </div>
 
-        <div v-else class="mt-8 rounded-[10px] bg-[#F2F7FC] px-5 py-10 text-center text-[14px] font-[600] text-main/70">
+        <div v-else class="mt-8 rounded-[10px] bg-surface-subtle px-5 py-10 text-center text-[14px] font-[600] text-main/70">
           Belum ada data kemitraan yang dapat ditampilkan.
         </div>
 

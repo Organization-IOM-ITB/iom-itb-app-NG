@@ -5,9 +5,9 @@
       class="fixed bottom-4 right-4 left-4 md:left-auto md:right-6 md:bottom-6 z-[1000] max-w-md mx-auto md:mx-0 pointer-events-none"
     >
       <div
-        class="pointer-events-auto bg-white rounded-[24px] shadow-soft border border-[#E7ECF8] overflow-hidden"
+        class="pointer-events-auto bg-white rounded-[24px] shadow-soft border border-line-brand overflow-hidden"
       >
-        <div class="bg-[#F3F7FF] px-4 md:px-5 py-3 border-b border-[#E7ECF8]">
+        <div class="bg-surface-subtle px-4 md:px-5 py-3 border-b border-line-brand">
           <div class="flex items-start gap-3">
             <div class="w-10 h-10 min-w-[40px] rounded-full bg-main text-white flex items-center justify-center shadow-sm">
               <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -28,7 +28,7 @@
 
         <div class="p-4 md:p-5 bg-white">
           <div v-for="p in pendingList" :key="p.orderId" class="mb-3 last:mb-0">
-            <div class="flex items-start justify-between gap-3 rounded-[18px] border border-[#E7ECF8] bg-[#FAFCFF] p-3 md:p-4">
+            <div class="flex items-start justify-between gap-3 rounded-[18px] border border-line-brand bg-surface-subtle p-3 md:p-4">
               <div class="flex-1 min-w-0">
                 <p class="text-[14px] font-[700] text-main truncate">{{ p.label || labelFor(p) }}</p>
                 <p class="text-[12px] text-main/65 mt-1">
@@ -53,7 +53,7 @@
                 <button
                   @click="dismiss(p)"
                   :disabled="cancelingOrderId === p.orderId"
-                  class="border border-[#D8E4FF] text-main/75 hover:bg-[#F3F7FF] hover:text-main disabled:opacity-50 text-[12px] font-[600] px-4 py-2 rounded-full transition"
+                  class="border border-line-brand text-main/75 hover:bg-surface-subtle hover:text-main disabled:opacity-50 text-[12px] font-[600] px-4 py-2 rounded-full transition"
                 >
                   Batalkan
                 </button>
