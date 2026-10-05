@@ -130,7 +130,7 @@
           v-model="paymentMethod"
           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-main focus:border-main sm:text-sm"
         >
-          <option value="manual">Manual (Transfer Bank)</option>
+          <option value="manual">Manual (Transfer Bank / QRIS)</option>
           <option v-if="midtransEnabled" value="midtrans">Online (Midtrans)</option>
           <option v-else value="midtrans" disabled>Online (Midtrans) - Sementara Tidak Tersedia</option>
         </select>
@@ -147,12 +147,29 @@
       </div>
 
       <div v-else class="mb-4">
+        <div class="mb-4 bg-gray-50 border border-gray-200 p-4 rounded text-sm text-gray-700">
+          <p class="font-medium">Bayar melalui salah satu cara berikut:</p>
+          <div class="flex flex-col md:flex-row gap-4 mt-3">
+            <div class="w-full md:w-1/2">
+              <p class="font-semibold">Transfer Bank</p>
+              <p class="mt-1">No. Rekening <strong>0028668954</strong> (BNI) An. IOM-ITB</p>
+            </div>
+            <div class="w-full md:w-1/2">
+              <p class="font-semibold">Scan QRIS</p>
+              <!-- QRIS statis: nominal diketik sendiri oleh pembeli saat scan. -->
+              <a :href="merchQrisImage" target="_blank" rel="noopener" title="Buka QRIS ukuran penuh">
+                <img :src="merchQrisImage" alt="QRIS IOM ITB Kegiatan (BNI)" class="mt-1 w-full max-w-[240px] h-auto rounded border border-gray-200" />
+              </a>
+              <p class="mt-1 text-xs text-gray-500">
+                Masukkan nominal <strong>{{ formatPrice(quantity * currentMerchandise.price) }}</strong> saat membayar.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <label class="block text-sm font-medium text-gray-700">
           Upload Bukti Pembayaran <span class="text-red-500">*</span>
         </label>
-        <span class="block text-sm font-medium text-gray-500">
-          No. Rekening 0028668954 (BNI) An. IOM-ITB
-        </span>
 
         <input
           type="file"
@@ -242,6 +259,9 @@ export default {
     };
   },
   computed: {
+    merchQrisImage() {
+      return require("@/assets/image/merch-qris-bni.jpeg");
+    },
     midtransEnabled() {
       return isMidtransEnabled();
     },
