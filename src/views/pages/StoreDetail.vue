@@ -130,7 +130,7 @@
           v-model="paymentMethod"
           class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-main focus:border-main sm:text-sm"
         >
-          <option value="manual">Manual (Transfer Bank / QRIS)</option>
+          <option value="manual">{{ showBankTransfer ? "Manual (Transfer Bank / QRIS)" : "Manual (QRIS)" }}</option>
           <option v-if="midtransEnabled" value="midtrans">Online (Midtrans)</option>
           <option v-else value="midtrans" disabled>Online (Midtrans) - Sementara Tidak Tersedia</option>
         </select>
@@ -148,9 +148,9 @@
 
       <div v-else class="mb-4">
         <div class="mb-4 bg-gray-50 border border-gray-200 p-4 rounded text-sm text-gray-700">
-          <p class="font-medium">Bayar melalui salah satu cara berikut:</p>
+          <p class="font-medium">{{ showBankTransfer ? "Bayar melalui salah satu cara berikut:" : "Bayar melalui QRIS berikut:" }}</p>
           <div class="flex flex-col md:flex-row gap-4 mt-3">
-            <div class="w-full md:w-1/2">
+            <div v-if="showBankTransfer" class="w-full md:w-1/2">
               <p class="font-semibold">Transfer Bank</p>
               <p class="mt-1">No. Rekening <strong>0028668954</strong> (BNI) An. IOM-ITB</p>
             </div>
@@ -259,6 +259,11 @@ export default {
     };
   },
   computed: {
+    // Transfer rekening untuk merchandise ditutup sementara — hanya QRIS.
+    // Ubah ke true untuk menampilkan lagi No. Rekening BNI.
+    showBankTransfer() {
+      return false;
+    },
     merchQrisImage() {
       return require("@/assets/image/merch-qris-bni.jpeg");
     },
