@@ -1,5 +1,7 @@
 <template>
   <div class="bg-colorSecond pt-[10px] pb-[32px] px-[18px] md:px-[70px]">
+    <MerchPoNotice class="max-w-3xl mx-auto" />
+
     <!-- Merchandise Details -->
     <div class="max-w-3xl mx-auto bg-white border border-gray-200 rounded-lg shadow p-6">
       <div class="flex flex-col md:flex-row">
@@ -230,10 +232,14 @@ import Swal from 'sweetalert2';
 import { savePendingPayment, removePendingPayment } from "@/utils/pendingPayments";
 import { syncPaymentStatus, isTerminalPaymentStatus, isMidtransEnabled } from "@/utils/midtransPayment";
 import { isNotStartedPaymentSession } from "@/utils/paymentSessionState";
+import MerchPoNotice from "@/components/MerchPoNotice.vue";
 
 const successLogo = require('@/assets/image/IOM-ITB-PrimaryLogo-blue.png');
 
 export default {
+  components: {
+    MerchPoNotice,
+  },
   data() {
     return {
       quantity: 1,

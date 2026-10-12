@@ -2,6 +2,8 @@
   <div class="bg-colorSecond pt-[10px] pb-[32px] px-[4px] sm:px-[18px] md:px-[70px]">
     <h2 class="text-main font-[800] text-[32px] md:text-[50px] leading-tight md:leading-[65.1px] py-[16px] text-center md:text-start">Merchandise</h2>
 
+    <MerchPoNotice />
+
     <div class="flex flex-col sm:flex-row gap-3 mb-4">
       <div class="relative flex-1">
         <span class="absolute inset-y-0 left-0 flex items-center pl-3">
@@ -115,11 +117,13 @@ import HeaderItem from "@/components/header/HeaderItem.vue";
 import { GET_MERCHANDISES } from "@/store/merchandises.module";
 import { truncate } from "@/utils/index"
 import Loading from "vue-loading-overlay";
+import MerchPoNotice from "@/components/MerchPoNotice.vue";
 
 export default {
   components: {
     HeaderItem,
-    Loading
+    Loading,
+    MerchPoNotice
   },
   data() {
     return {
