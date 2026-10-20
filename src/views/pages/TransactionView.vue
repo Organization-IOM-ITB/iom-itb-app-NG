@@ -40,6 +40,9 @@
           <p class="text-gray-600">Username: {{ currentTransaction?.username }}</p>
           <p class="text-gray-600">Email: {{ currentTransaction?.email }}</p>
           <p class="text-gray-600">No Telp: {{ currentTransaction?.noTelp }}</p>
+          <p v-if="(currentTransaction?.selectedOptions || []).length" class="text-gray-600">
+            Pilihan: {{ currentTransaction.selectedOptions.map((o) => `${o.name} ${o.value}`).join(", ") }}
+          </p>
           <p class="text-gray-600">Jumlah: {{ currentTransaction?.qty }}</p>
           <p class="text-gray-600">Harga: {{ formatPrice(currentTransaction?.merchandises?.price) }}</p>
           <p v-if="currentTransaction?.shippingCost != null" class="text-gray-600">Ongkir: {{ formatPrice(currentTransaction.shippingCost) }}</p>

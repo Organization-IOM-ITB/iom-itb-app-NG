@@ -23,6 +23,7 @@
           />
           <div class="flex-1">
             <h2 class="text-lg font-bold">{{ transaction?.merchandises?.name || '-' }}</h2>
+            <p v-if="optionsText" class="text-gray-600 text-sm">{{ optionsText }}</p>
             <p class="text-gray-600 text-sm">Jumlah: {{ transaction.qty }}</p>
             <p class="text-gray-600 text-sm">Harga satuan: {{ formatIDR(transaction?.merchandises?.price) }}</p>
             <p v-if="transaction.shippingCost != null" class="text-gray-600 text-sm">
@@ -167,6 +168,12 @@ export default {
     },
     transaction() {
       return this.$store.getters.currentTransaction?.data || null;
+    },
+    optionsText() {
+      const options = this.transaction?.selectedOptions;
+      return Array.isArray(options) && options.length
+        ? options.map((o) => `${o.name}: ${o.value}`).join(" · ")
+        : "";
     },
     paymentStatusLabel() {
       return PAYMENT_STATUS_LABELS[this.transaction?.paymentStatus] || this.transaction?.paymentStatus || "-";

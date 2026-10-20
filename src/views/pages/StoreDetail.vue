@@ -22,8 +22,30 @@
         <div class="flex-1 mt-4 md:mt-0 md:ml-6">
           <h1 class="text-3xl font-bold text-gray-900 mb-2">{{ currentMerchandise.name }}</h1>
           <p class="text-gray-700 mb-4">{{ currentMerchandise.description }}</p>
-          <p class="text-2xl font-bold text-main mb-4">{{ formatPrice(currentMerchandise.price) }}</p>
-          <p class="text-gray-500 mb-6">Stok: {{ currentMerchandise.stock }}</p>
+          <p class="text-2xl font-bold text-main mb-1">{{ formatPrice(unitPrice) }}</p>
+          <p v-if="optionExtraPrice" class="text-xs text-gray-500 mb-3">
+            Harga dasar {{ formatPrice(currentMerchandise.price) }} + {{ formatPrice(optionExtraPrice) }} dari pilihan Anda
+          </p>
+          <p class="text-gray-500 mb-6" :class="{ 'mt-3': !optionExtraPrice }">Stok: {{ currentMerchandise.stock }}</p>
+
+          <!-- Opsi produk (Warna, Lengan, Size, ...) -->
+          <div v-for="group in optionGroups" :key="group.name" class="mb-4">
+            <label :for="`opt-${group.name}`" class="block text-sm font-medium text-gray-700">
+              {{ group.name }} <span class="text-red-500">*</span>
+            </label>
+            <select
+              :id="`opt-${group.name}`"
+              v-model="selectedOptions[group.name]"
+              class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-main focus:border-main sm:text-sm"
+              :class="errors.options && !selectedOptions[group.name] ? 'border-red-500' : 'border-gray-300'"
+            >
+              <option value="" disabled>Pilih {{ group.name }}</option>
+              <option v-for="value in group.values" :key="value.label" :value="value.label">
+                {{ value.label }}{{ value.extraPrice ? ` (+${formatPrice(value.extraPrice)})` : "" }}
+              </option>
+            </select>
+          </div>
+          <p v-if="errors.options" class="-mt-2 mb-4 text-sm text-red-500">{{ errors.options }}</p>
 
           <!-- Quantity Input -->
           <div class="mb-4">
@@ -286,6 +308,7 @@ export default {
       payment: "",
       paymentMethod: "manual",
       isDragging: false,
+      selectedOptions: {},
       shippingRates: [],
       shippingQuote: null,
       shippingLoading: false,
@@ -293,6 +316,7 @@ export default {
       shippingRequestId: 0,
       errors: {
         quantity: "",
+        options: "",
         name: "",
         email: "",
         noTelp: "",
@@ -319,8 +343,23 @@ export default {
     merchandiseId() {
       return this.$route.params.id;
     },
+    optionGroups() {
+      const options = this.currentMerchandise.options;
+      return Array.isArray(options) ? options : [];
+    },
+    // Tambahan harga dari pilihan opsi (mis. XXL, lengan panjang). Server
+    // menghitung ulang saat pesanan dibuat.
+    optionExtraPrice() {
+      return this.optionGroups.reduce((sum, group) => {
+        const picked = group.values.find((v) => v.label === this.selectedOptions[group.name]);
+        return sum + Number(picked?.extraPrice || 0);
+      }, 0);
+    },
+    unitPrice() {
+      return Number(this.currentMerchandise.price || 0) + this.optionExtraPrice;
+    },
     subtotal() {
-      return Number(this.quantity || 0) * Number(this.currentMerchandise.price || 0);
+      return Number(this.quantity || 0) * this.unitPrice;
     },
     totalPayment() {
       return this.subtotal + (this.shippingQuote ? this.shippingQuote.cost : 0);
@@ -329,6 +368,20 @@ export default {
   watch: {
     "userInfo.address"() {
       this.scheduleShippingQuote();
+    },
+    optionGroups: {
+      immediate: true,
+      handler(groups) {
+        this.selectedOptions = Object.fromEntries(groups.map((g) => [g.name, ""]));
+      },
+    },
+    selectedOptions: {
+      deep: true,
+      handler() {
+        if (this.errors.options && this.optionGroups.every((g) => this.selectedOptions[g.name])) {
+          this.errors.options = "";
+        }
+      },
     },
   },
   mounted() {
@@ -487,6 +540,8 @@ export default {
         address: this.userInfo.address,
         qty: Number(this.quantity),
         notes: this.userInfo.notes || undefined,
+        // String JSON: checkout manual dikirim sebagai multipart/form-data.
+        selectedOptions: this.optionGroups.length ? JSON.stringify(this.selectedOptions) : undefined,
       };
 
       const confirmCheckout = await Swal.fire({
@@ -531,7 +586,8 @@ export default {
         console.error(err);
         await Swal.fire({
           title: "Error!",
-          text: "There was a problem with your transaction.",
+          // Pesan validasi server (opsi/alamat) lebih jelas daripada pesan umum.
+          text: err?.response?.data?.message || "There was a problem with your transaction.",
           icon: "error",
           confirmButtonText: "OK",
         });
@@ -631,6 +687,7 @@ export default {
     clearErrors() {
       this.errors = {
         quantity: "",
+        options: "",
         name: "",
         email: "",
         noTelp: "",
@@ -682,6 +739,12 @@ export default {
         isValid = false;
       } else if (stock && qty > stock) {
         this.errors.quantity = `Jumlah produk tidak boleh melebihi stok (${stock}).`;
+        isValid = false;
+      }
+
+      const missingOptions = this.optionGroups.filter((g) => !this.selectedOptions[g.name]).map((g) => g.name);
+      if (missingOptions.length) {
+        this.errors.options = `Pilih ${missingOptions.join(", ")} terlebih dahulu.`;
         isValid = false;
       }
 
