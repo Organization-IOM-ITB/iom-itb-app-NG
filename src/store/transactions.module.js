@@ -10,6 +10,8 @@ export const POST_TRANSACTION = "postTransaction";
 export const POST_TRANSACTION_SNAP = "postTransactionSnap";
 export const PUT_TRANSACTION = "putTransaction";
 export const DELETE_TRANSACTION = "deleteTransaction";
+export const GET_SHIPPING_RATES = "getShippingRates";
+export const GET_SHIPPING_QUOTE = "getShippingQuote";
 
 const state = {
     transactions: [],
@@ -106,6 +108,16 @@ const actions = {
                     reject(err);
                 });
         });
+    },
+    // Ongkir: tarif per wilayah dan pratinjau dari teks alamat. Data
+    // dikembalikan langsung (tidak disimpan di state).
+    async [GET_SHIPPING_RATES]() {
+        const { data } = await ApiService.query("/transactions/shipping-rates");
+        return data?.data || [];
+    },
+    async [GET_SHIPPING_QUOTE](context, params) {
+        const { data } = await ApiService.postJson("/transactions/shipping-quote", { address: params.address });
+        return data?.data || null;
     },
     [PUT_TRANSACTION](context, params){
         return new Promise((resolve, reject) => {

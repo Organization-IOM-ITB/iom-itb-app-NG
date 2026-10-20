@@ -42,7 +42,8 @@
           <p class="text-gray-600">No Telp: {{ currentTransaction?.noTelp }}</p>
           <p class="text-gray-600">Jumlah: {{ currentTransaction?.qty }}</p>
           <p class="text-gray-600">Harga: {{ formatPrice(currentTransaction?.merchandises?.price) }}</p>
-          <p class="text-gray-600">Total: {{ formatPrice(currentTransaction?.merchandises?.price * currentTransaction?.qty) }}</p>
+          <p v-if="currentTransaction?.shippingCost != null" class="text-gray-600">Ongkir: {{ formatPrice(currentTransaction.shippingCost) }}</p>
+          <p class="text-gray-600">Total: {{ formatPrice(currentTransaction?.grossAmount ?? currentTransaction?.merchandises?.price * currentTransaction?.qty) }}</p>
 
           <!-- Transaction Status -->
           <div class="mt-4">

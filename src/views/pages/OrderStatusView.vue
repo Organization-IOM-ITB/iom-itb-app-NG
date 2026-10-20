@@ -25,6 +25,9 @@
             <h2 class="text-lg font-bold">{{ transaction?.merchandises?.name || '-' }}</h2>
             <p class="text-gray-600 text-sm">Jumlah: {{ transaction.qty }}</p>
             <p class="text-gray-600 text-sm">Harga satuan: {{ formatIDR(transaction?.merchandises?.price) }}</p>
+            <p v-if="transaction.shippingCost != null" class="text-gray-600 text-sm">
+              Ongkir: {{ formatIDR(transaction.shippingCost) }}<span v-if="transaction.shippingZoneLabel"> ({{ transaction.shippingZoneLabel }})</span>
+            </p>
           </div>
         </div>
 

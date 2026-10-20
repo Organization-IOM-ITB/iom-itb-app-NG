@@ -99,16 +99,43 @@
 
       <div class="mb-4">
         <label for="address" class="block text-sm font-medium text-gray-700">
-          Alamat Lengkap <span class="ext-red-500">*</span>
+          Alamat Lengkap <span class="text-red-500">*</span>
         </label>
         <textarea
           id="address"
           v-model.trim="userInfo.address"
           rows="3"
+          placeholder="Jalan, nomor, kecamatan, kota/kabupaten, provinsi, kode pos"
           class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-main focus:border-main sm:text-sm"
           :class="errors.address ? 'border-red-500' : 'border-gray-300'"
         ></textarea>
+        <p class="mt-1 text-xs text-gray-500">Ongkir dihitung dari kota/kabupaten pada alamat ini.</p>
         <p v-if="errors.address" class="mt-1 text-sm text-red-500">{{ errors.address }}</p>
+
+        <div v-if="userInfo.address" class="mt-2 text-sm">
+          <p v-if="shippingLoading" class="text-gray-500">Menghitung ongkir…</p>
+          <p v-else-if="shippingQuote" class="rounded border border-green-200 bg-green-50 px-3 py-2 text-gray-700">
+            Ongkir ke <strong>{{ shippingQuote.matchedPlace }}</strong>:
+            <strong>{{ formatPrice(shippingQuote.cost) }}</strong>
+            <span class="text-gray-500">
+              (tarif {{ shippingQuote.zoneLabel }}{{ shippingQuote.byNearest ? ", wilayah tarif terdekat" : "" }})
+            </span>
+          </p>
+          <p v-else-if="shippingChecked" class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
+            Kota/kabupaten belum dikenali. Lengkapi alamat sampai nama kota/kabupaten dan provinsi agar ongkir bisa dihitung.
+          </p>
+        </div>
+
+        <details v-if="shippingRates.length" class="mt-2 text-sm text-gray-600">
+          <summary class="cursor-pointer select-none text-main">Lihat tarif ongkir</summary>
+          <ul class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
+            <li v-for="rate in shippingRates" :key="rate.zone" class="flex justify-between gap-4">
+              <span>{{ rate.label }}</span>
+              <span class="font-medium">{{ formatPrice(rate.cost) }}</span>
+            </li>
+          </ul>
+          <p class="mt-1 text-xs text-gray-500">Alamat di luar daftar memakai tarif wilayah terdekat.</p>
+        </details>
       </div>
 
       <div class="mb-4">
@@ -136,9 +163,11 @@
           <option v-if="midtransEnabled" value="midtrans">Online (Midtrans)</option>
           <option v-else value="midtrans" disabled>Online (Midtrans) - Sementara Tidak Tersedia</option>
         </select>
-        <span class="block text-sm font-medium text-gray-500 mt-2">
-          Total Pembayaran: {{ formatPrice(quantity * currentMerchandise.price) }}
-        </span>
+        <div class="mt-2 text-sm text-gray-500 space-y-0.5">
+          <p>Subtotal: {{ formatPrice(subtotal) }}</p>
+          <p>Ongkir: {{ shippingQuote ? formatPrice(shippingQuote.cost) : "— (lengkapi alamat)" }}</p>
+          <p class="font-medium text-gray-700">Total Pembayaran: {{ formatPrice(totalPayment) }}</p>
+        </div>
       </div>
 
       <div v-if="paymentMethod === 'midtrans'" class="mb-4 bg-blue-50 border border-blue-200 p-4 rounded">
@@ -163,7 +192,10 @@
                 <img :src="merchQrisImage" alt="QRIS IOM ITB Kegiatan (BNI)" class="mt-1 w-full max-w-[240px] h-auto rounded border border-gray-200" />
               </a>
               <p class="mt-1 text-xs text-gray-500">
-                Masukkan nominal <strong>{{ formatPrice(quantity * currentMerchandise.price) }}</strong> saat membayar.
+                <template v-if="shippingQuote">
+                  Masukkan nominal <strong>{{ formatPrice(totalPayment) }}</strong> (termasuk ongkir) saat membayar.
+                </template>
+                <template v-else>Lengkapi alamat dulu untuk melihat total yang harus dibayar (termasuk ongkir).</template>
               </p>
             </div>
           </div>
@@ -227,7 +259,7 @@
 
 <script>
 import { GET_MERCHANDISE_DETAIL } from "@/store/merchandises.module";
-import { POST_TRANSACTION, POST_TRANSACTION_SNAP } from "@/store/transactions.module";
+import { POST_TRANSACTION, POST_TRANSACTION_SNAP, GET_SHIPPING_RATES, GET_SHIPPING_QUOTE } from "@/store/transactions.module";
 import Swal from 'sweetalert2';
 import { savePendingPayment, removePendingPayment } from "@/utils/pendingPayments";
 import { syncPaymentStatus, isTerminalPaymentStatus, isMidtransEnabled } from "@/utils/midtransPayment";
@@ -254,6 +286,11 @@ export default {
       payment: "",
       paymentMethod: "manual",
       isDragging: false,
+      shippingRates: [],
+      shippingQuote: null,
+      shippingLoading: false,
+      shippingChecked: false,
+      shippingRequestId: 0,
       errors: {
         quantity: "",
         name: "",
@@ -282,11 +319,59 @@ export default {
     merchandiseId() {
       return this.$route.params.id;
     },
+    subtotal() {
+      return Number(this.quantity || 0) * Number(this.currentMerchandise.price || 0);
+    },
+    totalPayment() {
+      return this.subtotal + (this.shippingQuote ? this.shippingQuote.cost : 0);
+    },
+  },
+  watch: {
+    "userInfo.address"() {
+      this.scheduleShippingQuote();
+    },
   },
   mounted() {
     this.getData();
+    this.$store.dispatch(GET_SHIPPING_RATES)
+      .then((rates) => { this.shippingRates = rates; })
+      .catch(() => {});
+  },
+  beforeUnmount() {
+    clearTimeout(this.shippingTimer);
   },
   methods: {
+    // Ongkir dihitung server dari teks alamat (tunggu pengguna berhenti
+    // mengetik); nilai final tetap dihitung ulang server saat pesanan dibuat.
+    scheduleShippingQuote() {
+      clearTimeout(this.shippingTimer);
+      this.shippingQuote = null;
+      this.shippingChecked = false;
+      const address = this.userInfo.address;
+      if (!address) {
+        this.shippingLoading = false;
+        return;
+      }
+      this.shippingLoading = true;
+      this.shippingTimer = setTimeout(() => this.fetchShippingQuote(address), 600);
+    },
+    async fetchShippingQuote(address) {
+      const requestId = ++this.shippingRequestId;
+      try {
+        const quote = await this.$store.dispatch(GET_SHIPPING_QUOTE, { address });
+        if (requestId !== this.shippingRequestId) return;
+        this.shippingQuote = quote;
+        this.shippingChecked = true;
+        if (quote && this.errors.address) this.errors.address = "";
+      } catch (err) {
+        if (requestId !== this.shippingRequestId) return;
+        console.error(err);
+        this.shippingQuote = null;
+        this.shippingChecked = false;
+      } finally {
+        if (requestId === this.shippingRequestId) this.shippingLoading = false;
+      }
+    },
     async getData() {
       try {
         await this.$store.dispatch(GET_MERCHANDISE_DETAIL, {
@@ -469,7 +554,7 @@ export default {
       const orderStatusToken = payload.orderStatusToken || payload.trackingToken || payload.publicToken;
       if (!token) throw new Error("Snap token tidak tersedia");
 
-      const grossAmount = Number(this.currentMerchandise?.price || 0) * Number(basePayload.qty || 0);
+      const grossAmount = Number(payload.grossAmount ?? this.totalPayment);
       if (orderId) {
         savePendingPayment({
           orderId,
@@ -626,6 +711,11 @@ export default {
 
       if (!this.userInfo.address.trim()) {
         this.errors.address = "Alamat lengkap wajib diisi.";
+        isValid = false;
+      } else if (!this.shippingQuote) {
+        this.errors.address = this.shippingLoading
+          ? "Ongkir masih dihitung, tunggu sebentar."
+          : "Ongkir belum bisa dihitung. Lengkapi alamat sampai nama kota/kabupaten dan provinsi.";
         isValid = false;
       }
 
