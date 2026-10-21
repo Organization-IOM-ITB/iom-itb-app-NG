@@ -32,7 +32,7 @@
             </li>
           </ul>
           <p v-if="transaction.shippingCost != null" class="mt-3 text-gray-600 text-sm text-right">
-            Ongkir: {{ formatIDR(transaction.shippingCost) }}<span v-if="transaction.shippingZoneLabel"> ({{ transaction.shippingZoneLabel }})</span>
+            Ongkir: {{ formatIDR(transaction.shippingCost) }}<span v-if="transaction.shippingZoneLabel || transaction.shippingBilledKg"> ({{ [transaction.shippingZoneLabel, transaction.shippingBilledKg ? `${transaction.shippingBilledKg} kg` : null].filter(Boolean).join(", ") }})</span>
           </p>
         </div>
 

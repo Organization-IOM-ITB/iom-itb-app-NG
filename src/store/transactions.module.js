@@ -116,7 +116,10 @@ const actions = {
         return data?.data || [];
     },
     async [GET_SHIPPING_QUOTE](context, params) {
-        const { data } = await ApiService.postJson("/transactions/shipping-quote", { address: params.address });
+        const { data } = await ApiService.postJson("/transactions/shipping-quote", {
+            address: params.address,
+            weight: params.weight,
+        });
         return data?.data || null;
     },
     [PUT_TRANSACTION](context, params){

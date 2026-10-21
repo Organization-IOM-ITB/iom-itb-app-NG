@@ -53,7 +53,7 @@
             <p class="text-gray-600">Jumlah: {{ currentTransaction?.qty }}</p>
             <p class="text-gray-600">Harga: {{ formatPrice(currentTransaction?.merchandises?.price) }}</p>
           </template>
-          <p v-if="currentTransaction?.shippingCost != null" class="text-gray-600">Ongkir: {{ formatPrice(currentTransaction.shippingCost) }}</p>
+          <p v-if="currentTransaction?.shippingCost != null" class="text-gray-600">Ongkir: {{ formatPrice(currentTransaction.shippingCost) }}<span v-if="currentTransaction.shippingBilledKg"> ({{ currentTransaction.shippingBilledKg }} kg)</span></p>
           <p class="text-gray-600">Total: {{ formatPrice(currentTransaction?.grossAmount ?? currentTransaction?.merchandises?.price * currentTransaction?.qty) }}</p>
 
           <!-- Transaction Status -->

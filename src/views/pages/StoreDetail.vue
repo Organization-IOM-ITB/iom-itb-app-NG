@@ -28,6 +28,7 @@
           </p>
           <p class="text-gray-500 mb-6" :class="{ 'mt-3': !optionExtraPrice }">
             Stok: {{ currentMerchandise.stock }}
+            <span v-if="currentMerchandise.weight" class="text-gray-400"> · Berat ±{{ currentMerchandise.weight }} g</span>
             <span v-if="inCartQty" class="text-gray-400">({{ inCartQty }} sudah di keranjang)</span>
           </p>
 
@@ -90,7 +91,7 @@
             </button>
           </div>
           <p class="mt-3 text-xs text-gray-500">
-            Bisa memesan beberapa produk sekaligus: tambahkan ke keranjang, lalu checkout sekali dengan satu ongkir.
+            Bisa memesan beberapa produk sekaligus: tambahkan ke keranjang, lalu checkout sekali. Ongkir dihitung dari total berat pesanan.
           </p>
         </div>
       </div>
@@ -208,6 +209,7 @@ export default {
         name: this.currentMerchandise.name,
         image: this.currentMerchandise.image,
         unitPrice: this.unitPrice,
+        weight: this.currentMerchandise.weight != null ? Number(this.currentMerchandise.weight) : null,
         stock: Number(this.currentMerchandise.stock || 0),
         qty: Number(this.quantity),
         selectedOptions,

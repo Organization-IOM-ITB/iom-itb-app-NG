@@ -136,7 +136,9 @@
           class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-main focus:border-main sm:text-sm"
           :class="errors.address ? 'border-red-500' : 'border-gray-300'"
         ></textarea>
-        <p class="mt-1 text-xs text-gray-500">Ongkir dihitung sekali per pesanan dari kota/kabupaten pada alamat ini.</p>
+        <p class="mt-1 text-xs text-gray-500">
+          Ongkir dihitung dari kota/kabupaten pada alamat ini dan total berat pesanan (±{{ formatKg(totalWeight) }}).
+        </p>
         <p v-if="errors.address" class="mt-1 text-sm text-red-500">{{ errors.address }}</p>
 
         <div v-if="userInfo.address" class="mt-2 text-sm">
@@ -145,7 +147,9 @@
             Ongkir ke <strong>{{ shippingQuote.matchedPlace }}</strong>:
             <strong>{{ formatPrice(shippingQuote.cost) }}</strong>
             <span class="text-gray-500">
-              (tarif {{ shippingQuote.zoneLabel }}{{ shippingQuote.byNearest ? ", wilayah tarif terdekat" : "" }})
+              (tarif {{ shippingQuote.zoneLabel }}{{ shippingQuote.byNearest ? ", wilayah tarif terdekat" : "" }};
+              ditagih {{ shippingQuote.billedKg || 1 }} kg<template v-if="(shippingQuote.billedKg || 1) > 1">
+                = {{ formatPrice(shippingQuote.baseCost) }} + {{ (shippingQuote.billedKg || 1) - 1 }} × {{ formatPrice(shippingQuote.extraPerKg) }}</template>)
             </span>
           </p>
           <p v-else-if="shippingChecked" class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
@@ -158,10 +162,13 @@
           <ul class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
             <li v-for="rate in shippingRates" :key="rate.zone" class="flex justify-between gap-4">
               <span>{{ rate.label }}</span>
-              <span class="font-medium">{{ formatPrice(rate.cost) }}</span>
+              <span class="font-medium">{{ formatPrice(rate.cost) }}<span v-if="rate.extraPerKg" class="font-normal text-gray-500"> + {{ formatPrice(rate.extraPerKg) }}/kg</span></span>
             </li>
           </ul>
-          <p class="mt-1 text-xs text-gray-500">Alamat di luar daftar memakai tarif wilayah terdekat.</p>
+          <p class="mt-1 text-xs text-gray-500">
+            Tarif untuk 1 kg pertama, ditambah tarif per kg berikutnya. Berat dibulatkan ke atas bila lebih dari 0,3 kg.
+            Alamat di luar daftar memakai tarif wilayah terdekat.
+          </p>
         </details>
       </div>
 
@@ -192,7 +199,7 @@
         </select>
         <div class="mt-2 text-sm text-gray-500 space-y-0.5">
           <p>Subtotal ({{ cartCount }} pcs): {{ formatPrice(subtotal) }}</p>
-          <p>Ongkir: {{ shippingQuote ? formatPrice(shippingQuote.cost) : "— (lengkapi alamat)" }}</p>
+          <p>Ongkir{{ shippingQuote ? ` (${shippingQuote.billedKg || 1} kg)` : "" }}: {{ shippingQuote ? formatPrice(shippingQuote.cost) : "— (lengkapi alamat)" }}</p>
           <p class="font-medium text-gray-700">Total Pembayaran: {{ formatPrice(totalPayment) }}</p>
         </div>
       </div>
@@ -297,6 +304,8 @@ import { isNotStartedPaymentSession } from "@/utils/paymentSessionState";
 import MerchPoNotice from "@/components/MerchPoNotice.vue";
 
 const successLogo = require('@/assets/image/IOM-ITB-PrimaryLogo-blue.png');
+// Sama dengan DEFAULT_ITEM_WEIGHT_GRAMS di api (produk yang beratnya belum diisi).
+const DEFAULT_ITEM_WEIGHT_GRAMS = 500;
 
 const emptyErrors = () => ({
   items: "",
@@ -360,6 +369,13 @@ export default {
     totalPayment() {
       return this.subtotal + (this.shippingQuote ? this.shippingQuote.cost : 0);
     },
+    // Total berat (gram) untuk ongkir; server menghitung ulang saat pesan.
+    totalWeight() {
+      return this.cartItems.reduce((sum, i) => {
+        const weight = i.weight != null ? Number(i.weight) : DEFAULT_ITEM_WEIGHT_GRAMS;
+        return sum + weight * i.qty;
+      }, 0);
+    },
     orderLabel() {
       return this.cartItems.length === 1 ? this.cartItems[0].name : `${this.cartItems.length} produk merchandise`;
     },
@@ -367,6 +383,10 @@ export default {
   watch: {
     "userInfo.address"() {
       this.scheduleShippingQuote();
+    },
+    // Jumlah/isi keranjang berubah → ongkir bisa berubah.
+    totalWeight() {
+      if (this.userInfo.address) this.scheduleShippingQuote();
     },
   },
   mounted() {
@@ -425,6 +445,7 @@ export default {
           ...item,
           name: merch.name,
           image: merch.image,
+          weight: merch.weight != null ? Number(merch.weight) : null,
           stock,
           unitPrice: Number(merch.price || 0) + extra,
         };
@@ -468,7 +489,7 @@ export default {
     async fetchShippingQuote(address) {
       const requestId = ++this.shippingRequestId;
       try {
-        const quote = await this.$store.dispatch(GET_SHIPPING_QUOTE, { address });
+        const quote = await this.$store.dispatch(GET_SHIPPING_QUOTE, { address, weight: this.totalWeight });
         if (requestId !== this.shippingRequestId) return;
         this.shippingQuote = quote;
         this.shippingChecked = true;
@@ -481,6 +502,9 @@ export default {
       } finally {
         if (requestId === this.shippingRequestId) this.shippingLoading = false;
       }
+    },
+    formatKg(grams) {
+      return `${(Number(grams || 0) / 1000).toLocaleString("id-ID", { maximumFractionDigits: 2 })} kg`;
     },
     formatPrice(price) {
       return parseFloat(price || 0).toLocaleString("id-ID", {

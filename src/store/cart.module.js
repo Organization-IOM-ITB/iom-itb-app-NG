@@ -43,7 +43,7 @@ const getters = {
 };
 
 const mutations = {
-  // item: { merchandiseId, name, image, unitPrice, stock, qty, selectedOptions }
+  // item: { merchandiseId, name, image, unitPrice, weight (gram/pcs), stock, qty, selectedOptions }
   [ADD_TO_CART](state, item) {
     const key = cartKey(item.merchandiseId, item.selectedOptions);
     const existing = state.items.find((i) => i.key === key);
