@@ -123,12 +123,42 @@
             <li class="nav-item">
               <a :class="`text-main hover:opacity-80 px-3 py-2 ${$route.path.startsWith('/kemitraan') ? 'font-[800]' : 'font-[500]'}`" aria-current="page" href="/kemitraan">Mitra Kami</a>
             </li>
+            <li v-if="showCart" class="nav-item">
+              <a
+              v-if="showCart"
+              href="/keranjang"
+              class="relative inline-flex items-center text-main hover:opacity-80 px-2 py-2"
+              :aria-label="`Keranjang (${cartCount} item)`"
+            >
+              <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2 4h13M9 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z" />
+              </svg>
+              <span
+                v-if="cartCount"
+                class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[11px] font-bold leading-[18px] text-center"
+              >{{ cartCount > 99 ? "99+" : cartCount }}</span>
+            </a>
+            </li>
             <li class="nav-item">
               <a :class="`text-white hover:opacity-80 px-[50px] py-[13px] bg-main rounded-full`" aria-current="page" href="/donasi">Donasi</a>
             </li>
           </ul>
         </div>
-        <div class="xl:hidden">
+        <div class="xl:hidden flex items-center gap-1 ms-auto">
+              <a
+              v-if="showCart"
+              href="/keranjang"
+              class="relative inline-flex items-center text-main hover:opacity-80 px-2 py-2"
+              :aria-label="`Keranjang (${cartCount} item)`"
+            >
+              <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l3-8H5.4M7 13L5.4 5M7 13l-2 4h13M9 21a1 1 0 100-2 1 1 0 000 2zm8 0a1 1 0 100-2 1 1 0 000 2z" />
+              </svg>
+              <span
+                v-if="cartCount"
+                class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-red-600 text-white text-[11px] font-bold leading-[18px] text-center"
+              >{{ cartCount > 99 ? "99+" : cartCount }}</span>
+            </a>
               <button
                 @click="toggleMenu"
                 :class="`text-gray-600 hover:text-gray-800 focus:text-gray-800 block focus:outline-none ms-auto`"
@@ -199,6 +229,15 @@ export default {
     },
     isAuthenticated() {
       return this.$store.getters.isAuthenticated;
+    },
+    cartCount() {
+      return this.$store.getters.cartCount;
+    },
+    // Ikon keranjang hanya di halaman merchandise/keranjang, atau bila
+    // keranjang berisi (agar pembeli bisa kembali dari halaman lain).
+    showCart() {
+      const path = this.$route.path;
+      return this.cartCount > 0 || path.startsWith("/merchandise") || path === "/keranjang";
     },
   },
   methods: {

@@ -35,16 +35,24 @@
 
         <!-- Transaction Details -->
         <div class="w-3/4 pl-4">
-          <h2 class="text-lg font-bold">{{ currentTransaction?.merchandises?.name }}</h2>
+          <h2 class="text-lg font-bold">{{ currentTransaction?.merchandises?.name }}<span v-if="itemCount > 1" class="text-gray-500 font-normal"> +{{ itemCount - 1 }} produk lain</span></h2>
           <p class="text-gray-600">Kode: {{ currentTransaction?.code }}</p>
           <p class="text-gray-600">Username: {{ currentTransaction?.username }}</p>
           <p class="text-gray-600">Email: {{ currentTransaction?.email }}</p>
           <p class="text-gray-600">No Telp: {{ currentTransaction?.noTelp }}</p>
-          <p v-if="(currentTransaction?.selectedOptions || []).length" class="text-gray-600">
-            Pilihan: {{ currentTransaction.selectedOptions.map((o) => `${o.name} ${o.value}`).join(", ") }}
-          </p>
-          <p class="text-gray-600">Jumlah: {{ currentTransaction?.qty }}</p>
-          <p class="text-gray-600">Harga: {{ formatPrice(currentTransaction?.merchandises?.price) }}</p>
+          <ul v-if="itemCount" class="text-gray-600">
+            <li v-for="(item, index) in currentTransaction.items" :key="index">
+              {{ item.merchandiseName }}<span v-if="(item.selectedOptions || []).length"> ({{ item.selectedOptions.map((o) => `${o.name} ${o.value}`).join(", ") }})</span>
+              — {{ item.qty }} x {{ formatPrice(item.unitPrice) }}
+            </li>
+          </ul>
+          <template v-else>
+            <p v-if="(currentTransaction?.selectedOptions || []).length" class="text-gray-600">
+              Pilihan: {{ currentTransaction.selectedOptions.map((o) => `${o.name} ${o.value}`).join(", ") }}
+            </p>
+            <p class="text-gray-600">Jumlah: {{ currentTransaction?.qty }}</p>
+            <p class="text-gray-600">Harga: {{ formatPrice(currentTransaction?.merchandises?.price) }}</p>
+          </template>
           <p v-if="currentTransaction?.shippingCost != null" class="text-gray-600">Ongkir: {{ formatPrice(currentTransaction.shippingCost) }}</p>
           <p class="text-gray-600">Total: {{ formatPrice(currentTransaction?.grossAmount ?? currentTransaction?.merchandises?.price * currentTransaction?.qty) }}</p>
 
@@ -88,6 +96,10 @@ export default {
   computed: {
     currentTransaction() {
       return this.$store.getters.currentTransaction?.data || {}; // Ensure correct data usage
+    },
+    itemCount() {
+      const items = this.currentTransaction?.items;
+      return Array.isArray(items) ? items.length : 0;
     },
   },
   mounted() {

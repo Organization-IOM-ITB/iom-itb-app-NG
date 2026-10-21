@@ -9,8 +9,9 @@ import members from "./members.module";
 import faculties from "./faculties.module";
 import kemitraan from "./kemitraan.module";
 import kegiatanKemitraan from "./kegiatanKemitraan.module";
+import cart, { REPLACE_CART, readCart } from "./cart.module";
 
-export default createStore({
+const store = createStore({
   state() {
     return {
       // state properties
@@ -33,5 +34,15 @@ export default createStore({
     faculties,
     kemitraan,
     kegiatanKemitraan,
+    cart,
   },
 });
+
+// Keranjang diubah di tab lain → samakan tab ini.
+if (typeof window !== "undefined") {
+  window.addEventListener("storage", (event) => {
+    if (event.key === "iom_cart") store.commit(REPLACE_CART, readCart());
+  });
+}
+
+export default store;

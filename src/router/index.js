@@ -50,6 +50,12 @@ const routes = [
         meta: { haveAuthenticated: false },
       },
       {
+        path: "/keranjang",
+        name: "Keranjang",
+        component: () => import("@/views/pages/CartView.vue"),
+        meta: { haveAuthenticated: false },
+      },
+      {
         path: "/transaksi",
         name: "Transaction",
         component: () => import("@/views/pages/TransactionView.vue"),

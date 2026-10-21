@@ -14,22 +14,26 @@
       </div>
 
       <div v-else-if="transaction" class="space-y-6">
-        <div class="flex items-start gap-4 border-b border-gray-200 pb-4">
-          <img
-            v-if="transaction?.merchandises?.image"
-            :src="transaction.merchandises.image"
-            alt="Produk"
-            class="w-24 h-24 rounded-md object-cover"
-          />
-          <div class="flex-1">
-            <h2 class="text-lg font-bold">{{ transaction?.merchandises?.name || '-' }}</h2>
-            <p v-if="optionsText" class="text-gray-600 text-sm">{{ optionsText }}</p>
-            <p class="text-gray-600 text-sm">Jumlah: {{ transaction.qty }}</p>
-            <p class="text-gray-600 text-sm">Harga satuan: {{ formatIDR(transaction?.merchandises?.price) }}</p>
-            <p v-if="transaction.shippingCost != null" class="text-gray-600 text-sm">
-              Ongkir: {{ formatIDR(transaction.shippingCost) }}<span v-if="transaction.shippingZoneLabel"> ({{ transaction.shippingZoneLabel }})</span>
-            </p>
-          </div>
+        <div class="border-b border-gray-200 pb-4">
+          <ul class="space-y-4">
+            <li v-for="(item, index) in orderItems" :key="index" class="flex items-start gap-4">
+              <img
+                v-if="item.image"
+                :src="item.image"
+                alt="Produk"
+                class="w-20 h-20 rounded-md object-cover"
+              />
+              <div class="flex-1">
+                <h2 class="font-bold">{{ item.merchandiseName || '-' }}</h2>
+                <p v-if="optionsText(item.selectedOptions)" class="text-gray-600 text-sm">{{ optionsText(item.selectedOptions) }}</p>
+                <p class="text-gray-600 text-sm">{{ item.qty }} x {{ formatIDR(item.unitPrice) }}</p>
+              </div>
+              <p class="font-semibold text-gray-800">{{ formatIDR(item.unitPrice * item.qty) }}</p>
+            </li>
+          </ul>
+          <p v-if="transaction.shippingCost != null" class="mt-3 text-gray-600 text-sm text-right">
+            Ongkir: {{ formatIDR(transaction.shippingCost) }}<span v-if="transaction.shippingZoneLabel"> ({{ transaction.shippingZoneLabel }})</span>
+          </p>
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -169,11 +173,17 @@ export default {
     transaction() {
       return this.$store.getters.currentTransaction?.data || null;
     },
-    optionsText() {
-      const options = this.transaction?.selectedOptions;
-      return Array.isArray(options) && options.length
-        ? options.map((o) => `${o.name}: ${o.value}`).join(" · ")
-        : "";
+    // Isi pesanan. Respons lama tanpa items memakai kolom produk tunggal.
+    orderItems() {
+      const trx = this.transaction || {};
+      if (Array.isArray(trx.items) && trx.items.length) return trx.items;
+      return [{
+        merchandiseName: trx.merchandises?.name,
+        image: trx.merchandises?.image,
+        unitPrice: Number(trx.merchandises?.price || 0),
+        qty: trx.qty,
+        selectedOptions: trx.selectedOptions,
+      }];
     },
     paymentStatusLabel() {
       return PAYMENT_STATUS_LABELS[this.transaction?.paymentStatus] || this.transaction?.paymentStatus || "-";
@@ -223,6 +233,11 @@ export default {
       } finally {
         this.loading = false;
       }
+    },
+    optionsText(options) {
+      return Array.isArray(options) && options.length
+        ? options.map((o) => `${o.name}: ${o.value}`).join(" · ")
+        : "";
     },
     formatIDR(value) {
       const n = Number(value || 0);
