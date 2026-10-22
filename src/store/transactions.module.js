@@ -109,7 +109,7 @@ const actions = {
                 });
         });
     },
-    // Ongkir: tarif per wilayah dan pratinjau dari teks alamat. Data
+    // Ongkir: tabel tarif cadangan dan pratinjau (kode pos + alamat). Data
     // dikembalikan langsung (tidak disimpan di state).
     async [GET_SHIPPING_RATES]() {
         const { data } = await ApiService.query("/transactions/shipping-rates");
@@ -118,6 +118,7 @@ const actions = {
     async [GET_SHIPPING_QUOTE](context, params) {
         const { data } = await ApiService.postJson("/transactions/shipping-quote", {
             address: params.address,
+            postalCode: params.postalCode,
             weight: params.weight,
         });
         return data?.data || null;

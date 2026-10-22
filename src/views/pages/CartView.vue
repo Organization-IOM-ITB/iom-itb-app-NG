@@ -136,28 +136,54 @@
           class="mt-1 block w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-main focus:border-main sm:text-sm"
           :class="errors.address ? 'border-red-500' : 'border-gray-300'"
         ></textarea>
-        <p class="mt-1 text-xs text-gray-500">
-          Ongkir dihitung dari kota/kabupaten pada alamat ini dan total berat pesanan (±{{ formatKg(totalWeight) }}).
-        </p>
         <p v-if="errors.address" class="mt-1 text-sm text-red-500">{{ errors.address }}</p>
+      </div>
 
-        <div v-if="userInfo.address" class="mt-2 text-sm">
+      <div class="mb-4">
+        <label for="postalCode" class="block text-sm font-medium text-gray-700">
+          Kode Pos <span class="text-red-500">*</span>
+        </label>
+        <input
+          id="postalCode"
+          v-model.trim="userInfo.postalCode"
+          type="text"
+          inputmode="numeric"
+          maxlength="5"
+          placeholder="Contoh: 40132"
+          @input="sanitizePostalCode"
+          class="mt-1 block w-full sm:w-40 px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-main focus:border-main sm:text-sm"
+          :class="errors.postalCode ? 'border-red-500' : 'border-gray-300'"
+        />
+        <p class="mt-1 text-xs text-gray-500">
+          Ongkir dihitung dari kode pos tujuan dan total berat pesanan (±{{ formatKg(totalWeight) }}).
+        </p>
+        <p v-if="errors.postalCode" class="mt-1 text-sm text-red-500">{{ errors.postalCode }}</p>
+
+        <div v-if="userInfo.address || validPostalCode" class="mt-2 text-sm">
           <p v-if="shippingLoading" class="text-gray-500">Menghitung ongkir…</p>
+          <p v-else-if="shippingQuote && isLiveQuote" class="rounded border border-green-200 bg-green-50 px-3 py-2 text-gray-700">
+            Ongkir ke <strong>{{ shippingQuote.matchedPlace }}</strong>:
+            <strong>{{ formatPrice(shippingQuote.cost) }}</strong>
+            <span class="text-gray-500">
+              ({{ shippingQuote.zoneLabel }}{{ shippingQuote.etd ? `, estimasi ${shippingQuote.etd}` : "" }};
+              ditagih {{ shippingQuote.billedKg || 1 }} kg)
+            </span>
+          </p>
           <p v-else-if="shippingQuote" class="rounded border border-green-200 bg-green-50 px-3 py-2 text-gray-700">
             Ongkir ke <strong>{{ shippingQuote.matchedPlace }}</strong>:
             <strong>{{ formatPrice(shippingQuote.cost) }}</strong>
             <span class="text-gray-500">
               (tarif {{ shippingQuote.zoneLabel }}{{ shippingQuote.byNearest ? ", wilayah tarif terdekat" : "" }};
-              ditagih {{ shippingQuote.billedKg || 1 }} kg<template v-if="(shippingQuote.billedKg || 1) > 1">
+              ditagih {{ shippingQuote.billedKg || 1 }} kg<template v-if="(shippingQuote.billedKg || 1) > 1 && shippingQuote.extraPerKg">
                 = {{ formatPrice(shippingQuote.baseCost) }} + {{ (shippingQuote.billedKg || 1) - 1 }} × {{ formatPrice(shippingQuote.extraPerKg) }}</template>)
             </span>
           </p>
           <p v-else-if="shippingChecked" class="rounded border border-amber-200 bg-amber-50 px-3 py-2 text-amber-800">
-            Kota/kabupaten belum dikenali. Lengkapi alamat sampai nama kota/kabupaten dan provinsi agar ongkir bisa dihitung.
+            Ongkir belum bisa dihitung. Periksa kode pos, atau lengkapi alamat sampai nama kota/kabupaten dan provinsi.
           </p>
         </div>
 
-        <details v-if="shippingRates.length" class="mt-2 text-sm text-gray-600">
+        <details v-if="shippingRates.length && !isLiveQuote" class="mt-2 text-sm text-gray-600">
           <summary class="cursor-pointer select-none text-main">Lihat tarif ongkir</summary>
           <ul class="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-1">
             <li v-for="rate in shippingRates" :key="rate.zone" class="flex justify-between gap-4">
@@ -199,7 +225,7 @@
         </select>
         <div class="mt-2 text-sm text-gray-500 space-y-0.5">
           <p>Subtotal ({{ cartCount }} pcs): {{ formatPrice(subtotal) }}</p>
-          <p>Ongkir{{ shippingQuote ? ` (${shippingQuote.billedKg || 1} kg)` : "" }}: {{ shippingQuote ? formatPrice(shippingQuote.cost) : "— (lengkapi alamat)" }}</p>
+          <p>Ongkir{{ shippingQuote ? ` (${shippingQuote.billedKg || 1} kg)` : "" }}: {{ shippingQuote ? formatPrice(shippingQuote.cost) : "— (lengkapi alamat dan kode pos)" }}</p>
           <p class="font-medium text-gray-700">Total Pembayaran: {{ formatPrice(totalPayment) }}</p>
         </div>
       </div>
@@ -229,7 +255,7 @@
                 <template v-if="shippingQuote">
                   Masukkan nominal <strong>{{ formatPrice(totalPayment) }}</strong> (termasuk ongkir) saat membayar.
                 </template>
-                <template v-else>Lengkapi alamat dulu untuk melihat total yang harus dibayar (termasuk ongkir).</template>
+                <template v-else>Lengkapi alamat dan kode pos dulu untuk melihat total yang harus dibayar (termasuk ongkir).</template>
               </p>
             </div>
           </div>
@@ -313,6 +339,7 @@ const emptyErrors = () => ({
   email: "",
   noTelp: "",
   address: "",
+  postalCode: "",
   payment: "",
 });
 
@@ -327,6 +354,7 @@ export default {
         email: "",
         noTelp: "",
         address: "",
+        postalCode: "",
         notes: "",
       },
       file: [],
@@ -376,6 +404,13 @@ export default {
         return sum + weight * i.qty;
       }, 0);
     },
+    validPostalCode() {
+      return /^\d{5}$/.test(this.userInfo.postalCode) ? this.userInfo.postalCode : "";
+    },
+    // Tarif kurir live (RajaOngkir/AgenWebsite); selain itu tabel zona.
+    isLiveQuote() {
+      return Boolean(this.shippingQuote && this.shippingQuote.provider && this.shippingQuote.provider !== "table");
+    },
     orderLabel() {
       return this.cartItems.length === 1 ? this.cartItems[0].name : `${this.cartItems.length} produk merchandise`;
     },
@@ -384,9 +419,12 @@ export default {
     "userInfo.address"() {
       this.scheduleShippingQuote();
     },
+    validPostalCode() {
+      this.scheduleShippingQuote();
+    },
     // Jumlah/isi keranjang berubah → ongkir bisa berubah.
     totalWeight() {
-      if (this.userInfo.address) this.scheduleShippingQuote();
+      if (this.userInfo.address || this.validPostalCode) this.scheduleShippingQuote();
     },
   },
   mounted() {
@@ -472,28 +510,35 @@ export default {
       delete rest[item.key];
       this.itemProblems = rest;
     },
-    // Ongkir dihitung server dari teks alamat (tunggu pengguna berhenti
-    // mengetik); nilai final tetap dihitung ulang server saat pesanan dibuat.
+    // Ongkir dihitung server dari kode pos (tarif kurir live) atau teks alamat
+    // (tabel zona) — tunggu pengguna berhenti mengetik; nilai final tetap
+    // dihitung ulang server saat pesanan dibuat.
     scheduleShippingQuote() {
       clearTimeout(this.shippingTimer);
       this.shippingQuote = null;
       this.shippingChecked = false;
       const address = this.userInfo.address;
-      if (!address) {
+      const postalCode = this.validPostalCode;
+      if (!address && !postalCode) {
         this.shippingLoading = false;
         return;
       }
       this.shippingLoading = true;
-      this.shippingTimer = setTimeout(() => this.fetchShippingQuote(address), 600);
+      this.shippingTimer = setTimeout(() => this.fetchShippingQuote(address, postalCode), 600);
     },
-    async fetchShippingQuote(address) {
+    async fetchShippingQuote(address, postalCode) {
       const requestId = ++this.shippingRequestId;
       try {
-        const quote = await this.$store.dispatch(GET_SHIPPING_QUOTE, { address, weight: this.totalWeight });
+        const quote = await this.$store.dispatch(GET_SHIPPING_QUOTE, {
+          address,
+          postalCode: postalCode || undefined,
+          weight: this.totalWeight,
+        });
         if (requestId !== this.shippingRequestId) return;
         this.shippingQuote = quote;
         this.shippingChecked = true;
         if (quote && this.errors.address) this.errors.address = "";
+        if (quote && this.errors.postalCode) this.errors.postalCode = "";
       } catch (err) {
         if (requestId !== this.shippingRequestId) return;
         console.error(err);
@@ -502,6 +547,9 @@ export default {
       } finally {
         if (requestId === this.shippingRequestId) this.shippingLoading = false;
       }
+    },
+    sanitizePostalCode() {
+      this.userInfo.postalCode = String(this.userInfo.postalCode || "").replace(/[^0-9]/g, "").slice(0, 5);
     },
     formatKg(grams) {
       return `${(Number(grams || 0) / 1000).toLocaleString("id-ID", { maximumFractionDigits: 2 })} kg`;
@@ -600,6 +648,7 @@ export default {
         email: this.userInfo.email,
         noTelp: this.userInfo.noTelp,
         address: this.userInfo.address,
+        postalCode: this.userInfo.postalCode,
         notes: this.userInfo.notes || undefined,
         // String JSON: checkout manual dikirim sebagai multipart/form-data.
         items: JSON.stringify(this.cartItems.map((item) => ({
@@ -803,10 +852,17 @@ export default {
       if (!this.userInfo.address.trim()) {
         this.errors.address = "Alamat lengkap wajib diisi.";
         isValid = false;
-      } else if (!this.shippingQuote) {
-        this.errors.address = this.shippingLoading
+      }
+      if (!this.userInfo.postalCode) {
+        this.errors.postalCode = "Kode pos wajib diisi.";
+        isValid = false;
+      } else if (!this.validPostalCode) {
+        this.errors.postalCode = "Kode pos harus 5 digit angka.";
+        isValid = false;
+      } else if (this.userInfo.address.trim() && !this.shippingQuote) {
+        this.errors.postalCode = this.shippingLoading
           ? "Ongkir masih dihitung, tunggu sebentar."
-          : "Ongkir belum bisa dihitung. Lengkapi alamat sampai nama kota/kabupaten dan provinsi.";
+          : "Ongkir belum bisa dihitung. Periksa kode pos, atau lengkapi alamat sampai nama kota/kabupaten dan provinsi.";
         isValid = false;
       }
 
