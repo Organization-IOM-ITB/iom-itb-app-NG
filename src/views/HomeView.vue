@@ -106,7 +106,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 justify-center px-8">
       <div v-for="video in videos" :key="video.id" class="text-center">
         <hr class="blue mb-4">
-        <iframe width="100%" height="180px" class="embed-responsive-item" :src="video.url" allowfullscreen></iframe>
+        <iframe width="100%" height="180px" class="embed-responsive-item" :src="video.url" loading="lazy" allowfullscreen></iframe>
       </div>
     </div>
   </div>

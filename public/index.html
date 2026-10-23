@@ -3478,8 +3478,10 @@
     <div id="app"></div>
     <script src="https://tally.so/widgets/embed.js"></script>
     <!-- built files will be auto injected -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+    <!-- defer: tidak menahan aplikasi (dan slide beranda) selama diunduh; window.snap baru dipakai saat bayar. -->
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
     <script
+      defer
       src="<%= process.env.VUE_APP_MIDTRANS_IS_PRODUCTION === 'true' ? 'https://app.midtrans.com/snap/snap.js' : 'https://app.sandbox.midtrans.com/snap/snap.js' %>"
       data-client-key="<%= process.env.VUE_APP_MIDTRANS_CLIENT_KEY %>"
     ></script>
